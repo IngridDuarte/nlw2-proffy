@@ -1,42 +1,64 @@
-import React from "react";
-import whatsappIcon from "../../assets/images/icons/whatsapp.svg";
-import "./styles.css";
+import React from 'react';
+import whatsappIcon from '../../assets/images/icons/whatsapp.svg'
+import api from '../../services/api';
 
-function TeacherItem() {
-  return (
-    <article className="teacher-item">
-      <header>
-        <img
-          src="https://scontent.fpoa12-1.fna.fbcdn.net/v/t1.0-9/106489131_1298390667033309_854873309038156031_n.jpg?_nc_cat=105&_nc_sid=09cbfe&_nc_ohc=olwQwhfR8sYAX8Osu9S&_nc_ht=scontent.fpoa12-1.fna&oh=d9c528ea1dd07f60e4e05f9a0152abb0&oe=5F543773"
-          alt="Ingrid Duarte"
-        />
-        <div>
-          <strong>Ingrid Duarte</strong>
-          <span>Programação</span>
-        </div>
-      </header>
+import './styles.css';
 
-      <p>
-        Entusiasta das melhores tecnologias back-end.
-        <br />
-        <br />
-        Apaixonada por compartilhar conhecimento e por mudar a vida das
-        pessoas através de experiências. Mais de 200.000 pessoas já passaram por
-        uma das minhas explosões.
-      </p>
-
-      <footer>
-        <p>
-          Preço/Hora
-          <strong>R$ 80,00</strong>
-        </p>
-        <button type="button">
-          <img src={whatsappIcon} alt="Whatsapp" />
-          Entrar em contato
-        </button>
-      </footer>
-    </article>
-  );
+export interface Teacher {
+  id: number;
+  avatar: string;
+  bio: string;
+  cost: number;    
+  name: string;
+  subject: string;    
+  whatsapp: string;
 }
 
-export default TeacherItem;
+interface TeacherItemProps {
+  teacher: Teacher;
+}
+
+const TeacherItem: React.FC<TeacherItemProps> = ({ teacher }) => {
+  function createNewConnection() {
+    api.post('connections',{
+      user_id: teacher.id
+    })
+  }
+
+  const message = `Olá ${teacher.name}, estou entrando em contato pois gostaria de ter aulas de ${teacher.subject} com o valor de ${Intl.NumberFormat('pt-BR', 
+  {style: 'currency', currency: 'BRL'}).format(teacher.cost)}`;
+
+  return (
+    <div>
+      <article className="teacher-item">
+          <header>
+            <img src={teacher.avatar} alt={teacher.name}/>
+            <div>
+              <strong>{teacher.name}</strong>
+              <span>{teacher.subject}</span>
+            </div>
+          </header>
+
+          <p>
+            {teacher.bio}
+          </p>
+
+          <footer>
+            <p>
+              Preço/Hora
+              <strong>R$ {teacher.cost}</strong>
+            </p>
+
+            <a 
+            target="_blank"
+            onClick={createNewConnection}href={`https://wa.me/${teacher.whatsapp}?text=${message}`}>
+              <img src={whatsappIcon} alt="whatsapp"/>
+              Entrar em contato
+            </a>
+          </footer>
+        </article>
+    </div>
+  )
+}
+
+export default TeacherItem
